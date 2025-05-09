@@ -16,15 +16,12 @@ class Voting(QMainWindow, Ui_MainWindow):
         id_entered = self.lineEdit.text()
         candidate = None
 
+
         if self.john_radiobutton.isChecked():
             candidate = 'John'
         elif self.jane_radiobutton.isChecked():
             candidate = 'Jane'
 
-
-        if candidate is None:
-            self.message_label('Select a candidate')
-            return
         try:
             self.voted(candidate, id_entered)
             self.message_label('Vote is submitted')
@@ -32,18 +29,24 @@ class Voting(QMainWindow, Ui_MainWindow):
             self.lineEdit.clear()
             self.john_radiobutton.setChecked(False)
             self.jane_radiobutton.setChecked(False)
+
         except ValueError as e:
             self.message_label(str(e))
 
     def voted(self, candidate: str, user_id: str) -> None:
+        if not user_id.isdigit() or len(user_id) != 5 and candidate is None:
+            raise ValueError('Please fill out all the fields.')
+        elif candidate is None:
+            raise ValueError('Please select a candidate.')
+
         if not user_id.isdigit() or len(user_id) != 5:
             raise ValueError('Invalid id. Please enter a 5-digit number.')
+
+
 
         if user_id in self.vote_results:
             raise ValueError('Already voted.')
 
-        if candidate not in self.vote:
-            raise ValueError(f'Candidate {candidate} not found.')
 
         self.vote[candidate] += 1
         self.vote_results[user_id] = candidate
